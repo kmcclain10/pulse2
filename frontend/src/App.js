@@ -11,28 +11,122 @@ import CreditApplication from './components/CreditApplication';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-// PULSE Logo Component - Exact from screenshots
-const PulseLogo = ({ size = "large" }) => {
+// PULSE Logo Component - Just pulse symbol
+const PulseLogo = ({ size = "large", showText = true }) => {
   return (
     <div className="flex items-center">
       <div className={`${size === "large" ? "w-12 h-12" : "w-8 h-8"} bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full flex items-center justify-center relative`}>
-        {/* Heart with pulse line */}
+        {/* Pulse/Heartbeat Symbol */}
         <svg className={`${size === "large" ? "w-7 h-7" : "w-5 h-5"} text-gray-900`} fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          <path d="M3 12h2l2-4 4 8 4-8 2 4h4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
-        {/* Pulse line */}
-        <div className="absolute -right-1 top-1/2 w-6 h-0.5 bg-yellow-400 transform -translate-y-1/2">
-          <div className="w-2 h-2 bg-yellow-400 rounded-full absolute -right-1 -top-0.5"></div>
-        </div>
       </div>
-      <span className={`${size === "large" ? "text-4xl" : "text-2xl"} font-bold text-white ml-4`}>
-        PULSE
-      </span>
+      {showText && (
+        <span className={`${size === "large" ? "text-4xl" : "text-2xl"} font-bold text-white ml-4`}>
+          PULSE
+        </span>
+      )}
     </div>
   );
 };
 
-// Main Header Component - Dealer Portal
+// Hamburger Menu Component
+const HamburgerMenu = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const menuItems = [
+    { name: 'Home', path: '/' },
+    { name: 'Inventory', path: '/customer-inventory' },
+    { name: 'Service', path: '/service' },
+    { name: 'Repair Shops', path: '/repair-shops' },
+    { name: 'Dealer Portal', path: '/dealer-portal' },
+    { name: 'Admin', path: '/admin' }
+  ];
+
+  const handleMenuClick = (path) => {
+    navigate(path);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative">
+      {/* Hamburger Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex flex-col justify-center items-center w-8 h-8 space-y-1 text-white hover:text-yellow-400 transition-colors"
+      >
+        <div className={`w-6 h-0.5 bg-current transition-all ${isOpen ? 'rotate-45 translate-y-1.5' : ''}`}></div>
+        <div className={`w-6 h-0.5 bg-current transition-all ${isOpen ? 'opacity-0' : ''}`}></div>
+        <div className={`w-6 h-0.5 bg-current transition-all ${isOpen ? '-rotate-45 -translate-y-1.5' : ''}`}></div>
+      </button>
+
+      {/* Menu Overlay */}
+      {isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={() => setIsOpen(false)}></div>
+      )}
+
+      {/* Menu Panel */}
+      <div className={`fixed top-0 left-0 h-full w-80 bg-gray-900 border-r border-gray-700 transform transition-transform duration-300 ease-in-out z-50 ${
+        isOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        <div className="p-6">
+          {/* Logo in Menu */}
+          <div className="flex items-center justify-between mb-8">
+            <PulseLogo size="small" />
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-gray-400 hover:text-white text-2xl"
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Menu Items */}
+          <nav className="space-y-4">
+            {menuItems.map((item) => (
+              <button
+                key={item.name}
+                onClick={() => handleMenuClick(item.path)}
+                className="block w-full text-left text-white hover:text-yellow-400 hover:bg-gray-800 px-4 py-3 rounded-lg transition-colors font-medium"
+              >
+                {item.name}
+              </button>
+            ))}
+          </nav>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Customer Header Component
+const CustomerHeader = () => {
+  return (
+    <header className="bg-gray-900 border-b border-gray-700">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Hamburger Menu */}
+          <HamburgerMenu />
+          
+          {/* PULSE Logo - Center */}
+          <div className="flex-1 flex justify-center">
+            <PulseLogo size="small" />
+          </div>
+          
+          {/* Right side - could add login button */}
+          <div className="flex items-center space-x-4">
+            <Link to="/dealer-portal" className="text-gray-300 hover:text-yellow-400 transition-colors font-medium">
+              Dealer Login
+            </Link>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+// Main Header Component - Dealer Portal (existing)
 const DealerHeader = ({ activePage = "inventory" }) => {
   const [selectedDealership, setSelectedDealership] = useState("Sample Dealership");
   
@@ -45,16 +139,16 @@ const DealerHeader = ({ activePage = "inventory" }) => {
           
           {/* Main Navigation */}
           <nav className="flex space-x-8">
-            <Link to="/inventory" className={`font-semibold text-lg pb-1 ${activePage === 'inventory' ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-gray-300 hover:text-white'}`}>
+            <Link to="/dealer-portal" className={`font-semibold text-lg pb-1 ${activePage === 'inventory' ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-gray-300 hover:text-white'}`}>
               INVENTORY
             </Link>
-            <Link to="/leads" className={`font-semibold text-lg pb-1 ${activePage === 'leads' ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-gray-300 hover:text-white'}`}>
+            <Link to="/dealer-leads" className={`font-semibold text-lg pb-1 ${activePage === 'leads' ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-gray-300 hover:text-white'}`}>
               LEADS
             </Link>
-            <Link to="/reports" className={`font-semibold text-lg pb-1 ${activePage === 'reports' ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-gray-300 hover:text-white'}`}>
+            <Link to="/dealer-reports" className={`font-semibold text-lg pb-1 ${activePage === 'reports' ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-gray-300 hover:text-white'}`}>
               REPORTS
             </Link>
-            <Link to="/tools" className={`font-semibold text-lg pb-1 ${activePage === 'tools' ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-gray-300 hover:text-white'}`}>
+            <Link to="/dealer-tools" className={`font-semibold text-lg pb-1 ${activePage === 'tools' ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-gray-300 hover:text-white'}`}>
               TOOLS
             </Link>
           </nav>
@@ -78,7 +172,411 @@ const DealerHeader = ({ activePage = "inventory" }) => {
   );
 };
 
-// Vehicle Modal Component
+// Customer Home Page
+const CustomerHomePage = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen bg-gray-900">
+      <CustomerHeader />
+      
+      {/* Hero Section */}
+      <div className="relative bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 min-h-screen flex items-center">
+        {/* Background Image Overlay */}
+        <div className="absolute inset-0 bg-black opacity-50"></div>
+        
+        {/* Hero Content */}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+              Find Your Perfect
+              <span className="text-yellow-400 block">Vehicle Today</span>
+            </h1>
+            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+              Browse thousands of quality pre-owned vehicles from trusted dealers across the nation. 
+              Every vehicle comes with authentic dealer photos and detailed specifications.
+            </p>
+            
+            {/* Search Bar */}
+            <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl p-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Make</label>
+                  <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
+                    <option>All Makes</option>
+                    <option>Ford</option>
+                    <option>Honda</option>
+                    <option>Toyota</option>
+                    <option>Chevrolet</option>
+                    <option>BMW</option>
+                    <option>Mercedes-Benz</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Model</label>
+                  <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
+                    <option>All Models</option>
+                    <option>F-150</option>
+                    <option>Accord</option>
+                    <option>Camry</option>
+                    <option>Silverado</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Year</label>
+                  <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
+                    <option>All Years</option>
+                    <option>2024</option>
+                    <option>2023</option>
+                    <option>2022</option>
+                    <option>2021</option>
+                    <option>2020</option>
+                    <option>2019</option>
+                  </select>
+                </div>
+                <div className="flex items-end">
+                  <button 
+                    onClick={() => navigate('/customer-inventory')}
+                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-6 rounded-lg transition-colors"
+                  >
+                    Search Vehicles
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button 
+                onClick={() => navigate('/customer-inventory')}
+                className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-8 py-4 rounded-xl font-bold text-lg transition-colors shadow-lg"
+              >
+                Browse Inventory
+              </button>
+              <button 
+                onClick={() => navigate('/repair-shops')}
+                className="bg-transparent border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-gray-900 px-8 py-4 rounded-xl font-bold text-lg transition-colors"
+              >
+                Find Repair Shops
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <section className="bg-gray-100 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose PULSE Auto Market?</h2>
+            <p className="text-xl text-gray-600">Your trusted partner in finding the perfect vehicle</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="bg-yellow-400 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Authentic Photos</h3>
+              <p className="text-gray-600">Only real dealer photos - no stock images or placeholders</p>
+            </div>
+
+            <div className="text-center">
+              <div className="bg-yellow-400 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Trusted Dealers</h3>
+              <p className="text-gray-600">Verified dealerships with excellent customer service</p>
+            </div>
+
+            <div className="text-center">
+              <div className="bg-yellow-400 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-gray-900" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Fast & Easy</h3>
+              <p className="text-gray-600">Quick search, instant results, seamless buying experience</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+// Customer Inventory Page
+const CustomerInventoryPage = () => {
+  const [vehicles, setVehicles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Mock data for customer view
+    setTimeout(() => {
+      setVehicles([
+        { id: '1', year: 2021, make: 'Audi', model: 'A4 Premium Quattro', price: 28500, mileage: 23450, dealer: 'Apex Auto' },
+        { id: '2', year: 2020, make: 'Ford', model: 'F-150 XLT', price: 32900, mileage: 18200, dealer: 'Premier Motors' },
+        { id: '3', year: 2019, make: 'Honda', model: 'CR-V EX', price: 24800, mileage: 28900, dealer: 'Elite Auto Group' },
+        { id: '4', year: 2022, make: 'BMW', model: '3 Series', price: 35900, mileage: 15200, dealer: 'Luxury Motors' },
+        { id: '5', year: 2020, make: 'Toyota', model: 'Camry SE', price: 22900, mileage: 31200, dealer: 'City Auto' },
+        { id: '6', year: 2021, make: 'Chevrolet', model: 'Silverado 1500', price: 38900, mileage: 22100, dealer: 'Truck Center' }
+      ]);
+      setLoading(false);
+    }, 1000);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900">
+        <CustomerHeader />
+        <div className="flex items-center justify-center h-96">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-yellow-400 mb-4"></div>
+            <p className="text-white text-xl">Loading vehicles...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-900">
+      <CustomerHeader />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 className="text-4xl font-bold text-white mb-8">Available Vehicles</h1>
+        
+        {/* Search Filters */}
+        <div className="bg-gray-800 rounded-xl p-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <input 
+              type="text" 
+              placeholder="Search by keyword..."
+              className="px-4 py-3 rounded-lg border border-gray-600 bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-500"
+            />
+            <select className="px-4 py-3 rounded-lg border border-gray-600 bg-gray-700 text-white focus:ring-2 focus:ring-yellow-500">
+              <option>All Makes</option>
+              <option>Audi</option>
+              <option>BMW</option>
+              <option>Ford</option>
+              <option>Honda</option>
+              <option>Toyota</option>
+            </select>
+            <select className="px-4 py-3 rounded-lg border border-gray-600 bg-gray-700 text-white focus:ring-2 focus:ring-yellow-500">
+              <option>All Years</option>
+              <option>2024</option>
+              <option>2023</option>
+              <option>2022</option>
+              <option>2021</option>
+              <option>2020</option>
+            </select>
+            <button className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-6 py-3 rounded-lg font-bold transition-colors">
+              Search
+            </button>
+          </div>
+        </div>
+
+        {/* Vehicles Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {vehicles.map((vehicle) => (
+            <div key={vehicle.id} className="bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+              <div className="h-48 bg-gray-700 flex items-center justify-center">
+                <svg className="w-20 h-20 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19 9l-1.26-3.78A2 2 0 0 0 15.84 4H8.16a2 2 0 0 0-1.9 1.22L5 9H3v11a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1h12v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1V9h-2zM7.5 17a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm9 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zM7 9l.84-2.52A1 1 0 0 1 8.78 6h6.44a1 1 0 0 1 .94.48L17 9H7z"/>
+                </svg>
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-white mb-2">
+                  {vehicle.year} {vehicle.make} {vehicle.model}
+                </h3>
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-2xl font-bold text-yellow-400">
+                    ${vehicle.price.toLocaleString()}
+                  </span>
+                  <span className="text-gray-400">
+                    {vehicle.mileage.toLocaleString()} miles
+                  </span>
+                </div>
+                <div className="text-sm text-gray-400 mb-4">
+                  <p className="font-medium">{vehicle.dealer}</p>
+                </div>
+                <div className="flex space-x-3">
+                  <button className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 px-4 rounded-lg">
+                    View Details
+                  </button>
+                  <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+                    Contact Dealer
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Repair Shops Page
+const RepairShopsPage = () => {
+  const [repairShops, setRepairShops] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Mock repair shop data
+    setTimeout(() => {
+      setRepairShops([
+        {
+          id: 1,
+          name: 'Elite Auto Repair',
+          address: '123 Main St, Nashville, TN 37203',
+          phone: '(615) 555-0123',
+          rating: 4.8,
+          reviews: 156,
+          services: ['Oil Change', 'Brake Service', 'Engine Repair', 'Transmission'],
+          hours: 'Mon-Fri: 8AM-6PM, Sat: 8AM-4PM'
+        },
+        {
+          id: 2,
+          name: 'Premier Auto Service',
+          address: '456 Broadway, Memphis, TN 38103',
+          phone: '(901) 555-0124',
+          rating: 4.6,
+          reviews: 98,
+          services: ['Diagnostic', 'AC Repair', 'Tire Service', 'Battery Replacement'],
+          hours: 'Mon-Fri: 7AM-7PM, Sat: 8AM-5PM'
+        },
+        {
+          id: 3,
+          name: 'Quick Fix Auto',
+          address: '789 Union Ave, Knoxville, TN 37902',
+          phone: '(865) 555-0125',
+          rating: 4.5,
+          reviews: 203,
+          services: ['Quick Lube', 'Inspection', 'Exhaust Service', 'Suspension'],
+          hours: 'Mon-Sat: 8AM-6PM, Sun: 10AM-4PM'
+        }
+      ]);
+      setLoading(false);
+    }, 1000);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900">
+        <CustomerHeader />
+        <div className="flex items-center justify-center h-96">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-yellow-400 mb-4"></div>
+            <p className="text-white text-xl">Finding repair shops...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-900">
+      <CustomerHeader />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-white mb-4">Auto Repair Shops</h1>
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            Find trusted automotive service centers near you. All shops are vetted and reviewed by our community.
+          </p>
+        </div>
+
+        {/* Search Bar */}
+        <div className="bg-gray-800 rounded-xl p-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <input 
+              type="text" 
+              placeholder="Enter ZIP code or city..."
+              className="px-4 py-3 rounded-lg border border-gray-600 bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-500"
+            />
+            <select className="px-4 py-3 rounded-lg border border-gray-600 bg-gray-700 text-white focus:ring-2 focus:ring-yellow-500">
+              <option>All Services</option>
+              <option>Oil Change</option>
+              <option>Brake Service</option>
+              <option>Engine Repair</option>
+              <option>Transmission</option>
+              <option>AC Repair</option>
+            </select>
+            <button className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-6 py-3 rounded-lg font-bold transition-colors">
+              Search Shops
+            </button>
+          </div>
+        </div>
+
+        {/* Repair Shops Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {repairShops.map((shop) => (
+            <div key={shop.id} className="bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+              <div className="h-48 bg-gray-700 flex items-center justify-center">
+                <svg className="w-20 h-20 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-white mb-2">{shop.name}</h3>
+                
+                {/* Rating */}
+                <div className="flex items-center mb-3">
+                  <div className="flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <span className="text-white ml-2 text-sm">
+                    {shop.rating} ({shop.reviews} reviews)
+                  </span>
+                </div>
+
+                <p className="text-gray-300 text-sm mb-3">{shop.address}</p>
+                <p className="text-gray-300 text-sm mb-3">{shop.phone}</p>
+                <p className="text-gray-400 text-sm mb-4">{shop.hours}</p>
+
+                {/* Services */}
+                <div className="mb-4">
+                  <div className="flex flex-wrap gap-1">
+                    {shop.services.slice(0, 3).map((service, index) => (
+                      <span key={index} className="bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs">
+                        {service}
+                      </span>
+                    ))}
+                    {shop.services.length > 3 && (
+                      <span className="bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs">
+                        +{shop.services.length - 3} more
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <button className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 px-4 rounded-lg transition-colors">
+                    Get Directions
+                  </button>
+                  <button className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                    Call Now
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Vehicle Modal Component (existing)
 const VehicleModal = ({ vehicle, isOpen, onClose }) => {
   if (!isOpen || !vehicle) return null;
 
@@ -134,31 +632,9 @@ const VehicleModal = ({ vehicle, isOpen, onClose }) => {
                 </div>
               </div>
               
-              <div className="space-y-3 pt-4">
-                <h4 className="text-lg font-bold text-white">Vehicle Details</h4>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Year:</span>
-                    <span className="text-white">{vehicle.year}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Make:</span>
-                    <span className="text-white">{vehicle.make}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Model:</span>
-                    <span className="text-white">{vehicle.model}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Trim:</span>
-                    <span className="text-white">{vehicle.trim || 'N/A'}</span>
-                  </div>
-                </div>
-              </div>
-              
               <div className="flex space-x-3 pt-4">
                 <Link 
-                  to={`/desking-tool?vehicle=${vehicle.id}`}
+                  to={`/dealer-tools?vehicle=${vehicle.id}`}
                   className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 px-4 rounded-lg text-center"
                 >
                   Start Deal
@@ -175,27 +651,13 @@ const VehicleModal = ({ vehicle, isOpen, onClose }) => {
   );
 };
 
-// Add Vehicle Modal Component
+// Add Vehicle Modal (existing - keeping for dealer portal)
 const AddVehicleModal = ({ isOpen, onClose, onVehicleAdded }) => {
   const [formData, setFormData] = useState({
-    year: '',
-    make: '',
-    model: '',
-    trim: '',
-    mileage: '',
-    price: '',
-    cost: '',
-    exterior_color: '',
-    interior_color: '',
-    transmission: '',
-    fuel_type: '',
-    drivetrain: '',
-    engine: '',
-    stock_number: '',
-    description: '',
-    vin: '',
-    dealer_id: 'sample-dealer-1',
-    dealer_name: 'Sample Dealership'
+    year: '', make: '', model: '', trim: '', mileage: '', price: '', cost: '',
+    exterior_color: '', interior_color: '', transmission: '', fuel_type: '',
+    drivetrain: '', engine: '', stock_number: '', description: '', vin: '',
+    dealer_id: 'sample-dealer-1', dealer_name: 'Sample Dealership'
   });
 
   const [submitting, setSubmitting] = useState(false);
@@ -238,26 +700,6 @@ const AddVehicleModal = ({ isOpen, onClose, onVehicleAdded }) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">VIN</label>
-                <input
-                  type="text"
-                  value={formData.vin}
-                  onChange={(e) => setFormData({...formData, vin: e.target.value})}
-                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Stock Number</label>
-                <input
-                  type="text"
-                  value={formData.stock_number}
-                  onChange={(e) => setFormData({...formData, stock_number: e.target.value})}
-                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                />
-              </div>
-              
-              <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Year *</label>
                 <input
                   type="number"
@@ -291,27 +733,6 @@ const AddVehicleModal = ({ isOpen, onClose, onVehicleAdded }) => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Trim</label>
-                <input
-                  type="text"
-                  value={formData.trim}
-                  onChange={(e) => setFormData({...formData, trim: e.target.value})}
-                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Mileage *</label>
-                <input
-                  type="number"
-                  value={formData.mileage}
-                  onChange={(e) => setFormData({...formData, mileage: e.target.value})}
-                  required
-                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                />
-              </div>
-              
-              <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Price *</label>
                 <input
                   type="number"
@@ -321,101 +742,6 @@ const AddVehicleModal = ({ isOpen, onClose, onVehicleAdded }) => {
                   className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
                 />
               </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Cost</label>
-                <input
-                  type="number"
-                  value={formData.cost}
-                  onChange={(e) => setFormData({...formData, cost: e.target.value})}
-                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Exterior Color</label>
-                <input
-                  type="text"
-                  value={formData.exterior_color}
-                  onChange={(e) => setFormData({...formData, exterior_color: e.target.value})}
-                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Interior Color</label>
-                <input
-                  type="text"
-                  value={formData.interior_color}
-                  onChange={(e) => setFormData({...formData, interior_color: e.target.value})}
-                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Transmission</label>
-                <select
-                  value={formData.transmission}
-                  onChange={(e) => setFormData({...formData, transmission: e.target.value})}
-                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                >
-                  <option value="">Select Transmission</option>
-                  <option value="Automatic">Automatic</option>
-                  <option value="Manual">Manual</option>
-                  <option value="CVT">CVT</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Fuel Type</label>
-                <select
-                  value={formData.fuel_type}
-                  onChange={(e) => setFormData({...formData, fuel_type: e.target.value})}
-                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                >
-                  <option value="">Select Fuel Type</option>
-                  <option value="Gasoline">Gasoline</option>
-                  <option value="Diesel">Diesel</option>
-                  <option value="Hybrid">Hybrid</option>
-                  <option value="Electric">Electric</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Drivetrain</label>
-                <select
-                  value={formData.drivetrain}
-                  onChange={(e) => setFormData({...formData, drivetrain: e.target.value})}
-                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                >
-                  <option value="">Select Drivetrain</option>
-                  <option value="FWD">Front Wheel Drive</option>
-                  <option value="RWD">Rear Wheel Drive</option>
-                  <option value="AWD">All Wheel Drive</option>
-                  <option value="4WD">Four Wheel Drive</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Engine</label>
-                <input
-                  type="text"
-                  value={formData.engine}
-                  onChange={(e) => setFormData({...formData, engine: e.target.value})}
-                  placeholder="e.g., 2.4L I4"
-                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-                rows={3}
-                className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none"
-              />
             </div>
             
             <div className="flex justify-end space-x-4">
@@ -441,19 +767,14 @@ const AddVehicleModal = ({ isOpen, onClose, onVehicleAdded }) => {
   );
 };
 
-// Inventory Page - Main dealer interface
-const InventoryPage = () => {
+// Dealer Inventory Page (existing functionality for dealer portal)
+const DealerInventoryPage = () => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('grid');
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [showVehicleModal, setShowVehicleModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [filters, setFilters] = useState({
-    keyword: '',
-    year: '',
-    make: ''
-  });
 
   useEffect(() => {
     fetchVehicles();
@@ -468,12 +789,9 @@ const InventoryPage = () => {
       console.error('Error fetching vehicles:', error);
       // Mock vehicle data for demo
       setVehicles([
-        { id: '1', year: 2019, make: 'Ford', model: 'Explorer', price: 33000, mileage: 10000, status: 'Available', trim: 'XLT' },
-        { id: '2', year: 2018, make: 'Honda', model: 'Accord', price: 28000, mileage: 15000, status: 'Available', trim: 'EX' },
-        { id: '3', year: 2020, make: 'Chevrolet', model: 'Silverado 1500', price: 42000, mileage: 25000, status: 'Available', trim: 'LT' },
-        { id: '4', year: 2019, make: 'BMW', model: '3 Series', price: 33000, mileage: 18000, status: 'Available', trim: '330i' },
-        { id: '5', year: 2021, make: 'Honda', model: 'Accord', price: 28000, mileage: 12000, status: 'Available', trim: 'Sport' },
-        { id: '6', year: 2018, make: 'Ford', model: 'F-150', price: 42000, mileage: 35000, status: 'Available', trim: 'XLT' }
+        { id: '1', year: 2019, make: 'Ford', model: 'Explorer', price: 33000, mileage: 10000, status: 'Available' },
+        { id: '2', year: 2018, make: 'Honda', model: 'Accord', price: 28000, mileage: 15000, status: 'Available' },
+        { id: '3', year: 2020, make: 'Chevrolet', model: 'Silverado 1500', price: 42000, mileage: 25000, status: 'Available' }
       ]);
     } finally {
       setLoading(false);
@@ -488,16 +806,6 @@ const InventoryPage = () => {
   const handleVehicleAdded = (newVehicle) => {
     setVehicles([...vehicles, newVehicle]);
   };
-
-  const filteredVehicles = vehicles.filter(vehicle => {
-    return (
-      (!filters.keyword || 
-        vehicle.make.toLowerCase().includes(filters.keyword.toLowerCase()) ||
-        vehicle.model.toLowerCase().includes(filters.keyword.toLowerCase())) &&
-      (!filters.year || vehicle.year.toString() === filters.year) &&
-      (!filters.make || vehicle.make.toLowerCase() === filters.make.toLowerCase())
-    );
-  });
 
   if (loading) {
     return (
@@ -518,9 +826,8 @@ const InventoryPage = () => {
       <DealerHeader activePage="inventory" />
       
       <div className="max-w-full px-6 py-8">
-        {/* Page Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-white">Inventory</h1>
+          <h1 className="text-4xl font-bold text-white">Dealer Inventory</h1>
           <button 
             onClick={() => setShowAddModal(true)}
             className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-6 py-3 rounded-lg flex items-center"
@@ -532,263 +839,48 @@ const InventoryPage = () => {
           </button>
         </div>
 
-        {/* Search and Filters */}
-        <div className="bg-gray-800 rounded-lg p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <input 
-              type="text" 
-              placeholder="Keyword"
-              value={filters.keyword}
-              onChange={(e) => setFilters({...filters, keyword: e.target.value})}
-              className="bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-            />
-            <select 
-              value={filters.year}
-              onChange={(e) => setFilters({...filters, year: e.target.value})}
-              className="bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+        {/* Vehicle Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {vehicles.map((vehicle) => (
+            <div 
+              key={vehicle.id} 
+              onClick={() => handleVehicleClick(vehicle)}
+              className="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
             >
-              <option value="">All Years</option>
-              <option value="2024">2024</option>
-              <option value="2023">2023</option>
-              <option value="2022">2022</option>
-              <option value="2021">2021</option>
-              <option value="2020">2020</option>
-              <option value="2019">2019</option>
-              <option value="2018">2018</option>
-            </select>
-            <select 
-              value={filters.make}
-              onChange={(e) => setFilters({...filters, make: e.target.value})}
-              className="bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-            >
-              <option value="">All Makes</option>
-              <option value="Ford">Ford</option>
-              <option value="Honda">Honda</option>
-              <option value="BMW">BMW</option>
-              <option value="Chevrolet">Chevrolet</option>
-              <option value="Toyota">Toyota</option>
-            </select>
-            <button className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-6 py-3 rounded-lg">
-              Search
-            </button>
-          </div>
-        </div>
-
-        {/* View Toggle */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex space-x-2">
-            <button 
-              onClick={() => setViewMode('grid')}
-              className={`px-4 py-2 rounded-lg font-medium ${viewMode === 'grid' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-700 text-white hover:bg-gray-600'}`}
-            >
-              Grid View
-            </button>
-            <button 
-              onClick={() => setViewMode('table')}
-              className={`px-4 py-2 rounded-lg font-medium ${viewMode === 'table' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-700 text-white hover:bg-gray-600'}`}
-            >
-              Table View
-            </button>
-          </div>
-          <p className="text-gray-400">{filteredVehicles.length} vehicles found</p>
-        </div>
-
-        {/* Grid View */}
-        {viewMode === 'grid' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredVehicles.map((vehicle) => (
-              <div 
-                key={vehicle.id} 
-                onClick={() => handleVehicleClick(vehicle)}
-                className="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
-              >
-                <div className="h-48 bg-gray-700 flex items-center justify-center">
-                  <svg className="w-20 h-20 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M19 9l-1.26-3.78A2 2 0 0 0 15.84 4H8.16a2 2 0 0 0-1.9 1.22L5 9H3v11a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1h12v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1V9h-2zM7.5 17a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm9 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zM7 9l.84-2.52A1 1 0 0 1 8.78 6h6.44a1 1 0 0 1 .94.48L17 9H7z"/>
-                  </svg>
-                </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-bold text-white mb-2">
-                    {vehicle.year} {vehicle.make} {vehicle.model}
-                  </h3>
-                  {vehicle.trim && <p className="text-gray-400 text-sm mb-2">{vehicle.trim}</p>}
-                  <div className="flex justify-between items-center">
-                    <span className="text-xl font-bold text-yellow-400">
-                      ${vehicle.price?.toLocaleString()}
-                    </span>
-                    <span className="text-gray-400 text-sm">
-                      {vehicle.mileage?.toLocaleString()} mi
-                    </span>
-                  </div>
-                  <div className="mt-3">
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                      {vehicle.status}
-                    </span>
-                  </div>
+              <div className="h-48 bg-gray-700 flex items-center justify-center">
+                <svg className="w-20 h-20 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19 9l-1.26-3.78A2 2 0 0 0 15.84 4H8.16a2 2 0 0 0-1.9 1.22L5 9H3v11a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1h12v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1V9h-2zM7.5 17a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm9 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zM7 9l.84-2.52A1 1 0 0 1 8.78 6h6.44a1 1 0 0 1 .94.48L17 9H7z"/>
+                </svg>
+              </div>
+              <div className="p-4">
+                <h3 className="text-lg font-bold text-white mb-2">
+                  {vehicle.year} {vehicle.make} {vehicle.model}
+                </h3>
+                <div className="flex justify-between items-center">
+                  <span className="text-xl font-bold text-yellow-400">
+                    ${vehicle.price?.toLocaleString()}
+                  </span>
+                  <span className="text-gray-400 text-sm">
+                    {vehicle.mileage?.toLocaleString()} mi
+                  </span>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-
-        {/* Table View */}
-        {viewMode === 'table' && (
-          <div className="bg-gray-800 rounded-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-700">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Photo</th>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Year</th>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Make & Model</th>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Price</th>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Mileage</th>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-gray-300 uppercase tracking-wider">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-700">
-                  {filteredVehicles.map((vehicle) => (
-                    <tr 
-                      key={vehicle.id} 
-                      onClick={() => handleVehicleClick(vehicle)}
-                      className="hover:bg-gray-700 cursor-pointer transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="w-16 h-12 bg-gray-600 rounded flex items-center justify-center">
-                          <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M19 9l-1.26-3.78A2 2 0 0 0 15.84 4H8.16a2 2 0 0 0-1.9 1.22L5 9H3v11a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1h12v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1V9h-2zM7.5 17a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm9 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zM7 9l.84-2.52A1 1 0 0 1 8.78 6h6.44a1 1 0 0 1 .94.48L17 9H7z"/>
-                          </svg>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm font-medium text-white">{vehicle.year}</td>
-                      <td className="px-6 py-4 text-sm font-medium text-white">
-                        {vehicle.make} {vehicle.model}
-                        {vehicle.trim && <div className="text-gray-400 text-xs">{vehicle.trim}</div>}
-                      </td>
-                      <td className="px-6 py-4 text-sm font-bold text-yellow-400">${vehicle.price?.toLocaleString()}</td>
-                      <td className="px-6 py-4 text-sm text-gray-300">{vehicle.mileage?.toLocaleString()} miles</td>
-                      <td className="px-6 py-4">
-                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                          {vehicle.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
-          </div>
-        )}
+          ))}
+        </div>
       </div>
 
-      {/* Vehicle Details Modal */}
       <VehicleModal 
         vehicle={selectedVehicle}
         isOpen={showVehicleModal}
         onClose={() => setShowVehicleModal(false)}
       />
 
-      {/* Add Vehicle Modal */}
       <AddVehicleModal 
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         onVehicleAdded={handleVehicleAdded}
       />
-    </div>
-  );
-};
-
-// Reports Page Component
-const ReportsPage = () => {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
-    try {
-      const response = await axios.get(`${API}/admin/stats`);
-      setStats(response.data);
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-      // Mock data for demo
-      setStats({
-        vehicles: { total: 247, available: 198, sold: 49, average_price: 28500 },
-        leads: { total: 89, new: 23 },
-        deals: { total: 156, pending: 12 }
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-900">
-        <DealerHeader activePage="reports" />
-        <div className="flex items-center justify-center h-96">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-yellow-400 mb-4"></div>
-            <p className="text-white text-xl">Loading reports...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-gray-900">
-      <DealerHeader activePage="reports" />
-      
-      <div className="max-w-full px-6 py-8">
-        <h1 className="text-4xl font-bold text-white mb-8">Dashboard Reports</h1>
-        
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gray-800 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-400 mb-2">Total Vehicles</h3>
-            <p className="text-3xl font-bold text-white">{stats?.vehicles?.total || 0}</p>
-            <p className="text-green-400 text-sm">{stats?.vehicles?.available || 0} available</p>
-          </div>
-          
-          <div className="bg-gray-800 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-400 mb-2">Active Leads</h3>
-            <p className="text-3xl font-bold text-white">{stats?.leads?.total || 0}</p>
-            <p className="text-blue-400 text-sm">{stats?.leads?.new || 0} new today</p>
-          </div>
-          
-          <div className="bg-gray-800 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-400 mb-2">Total Deals</h3>
-            <p className="text-3xl font-bold text-white">{stats?.deals?.total || 0}</p>
-            <p className="text-yellow-400 text-sm">{stats?.deals?.pending || 0} pending</p>
-          </div>
-          
-          <div className="bg-gray-800 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-400 mb-2">Avg Vehicle Price</h3>
-            <p className="text-3xl font-bold text-white">${(stats?.vehicles?.average_price || 0).toLocaleString()}</p>
-            <p className="text-green-400 text-sm">Market competitive</p>
-          </div>
-        </div>
-
-        {/* Charts Placeholder */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-gray-800 rounded-xl p-6">
-            <h3 className="text-xl font-bold text-white mb-4">Sales Performance</h3>
-            <div className="h-64 bg-gray-700 rounded-lg flex items-center justify-center">
-              <p className="text-gray-400">Sales chart will display here</p>
-            </div>
-          </div>
-          
-          <div className="bg-gray-800 rounded-xl p-6">
-            <h3 className="text-xl font-bold text-white mb-4">Lead Sources</h3>
-            <div className="h-64 bg-gray-700 rounded-lg flex items-center justify-center">
-              <p className="text-gray-400">Lead sources chart will display here</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
@@ -799,16 +891,36 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/" element={<InventoryPage />} />
-          <Route path="/inventory" element={<InventoryPage />} />
-          <Route path="/leads" element={
+          {/* Customer Pages */}
+          <Route path="/" element={<CustomerHomePage />} />
+          <Route path="/customer-inventory" element={<CustomerInventoryPage />} />
+          <Route path="/service" element={
+            <div className="min-h-screen bg-gray-900">
+              <CustomerHeader />
+              <div className="flex items-center justify-center h-96">
+                <h1 className="text-white text-4xl">Service Page - Coming Soon</h1>
+              </div>
+            </div>
+          } />
+          <Route path="/repair-shops" element={<RepairShopsPage />} />
+          
+          {/* Dealer Portal Pages */}
+          <Route path="/dealer-portal" element={<DealerInventoryPage />} />
+          <Route path="/dealer-leads" element={
             <div className="min-h-screen bg-gray-900">
               <DealerHeader activePage="leads" />
               <LeadsManagement />
             </div>
           } />
-          <Route path="/reports" element={<ReportsPage />} />
-          <Route path="/tools" element={
+          <Route path="/dealer-reports" element={
+            <div className="min-h-screen bg-gray-900">
+              <DealerHeader activePage="reports" />
+              <div className="flex items-center justify-center h-96">
+                <h1 className="text-white text-4xl">Dealer Reports - Coming Soon</h1>
+              </div>
+            </div>
+          } />
+          <Route path="/dealer-tools" element={
             <div className="min-h-screen bg-gray-900">
               <DealerHeader activePage="tools" />
               <div className="py-8">
@@ -816,14 +928,17 @@ function App() {
               </div>
             </div>
           } />
-          <Route path="/desking-tool" element={
+          
+          {/* Admin */}
+          <Route path="/admin" element={
             <div className="min-h-screen bg-gray-900">
-              <DealerHeader activePage="tools" />
-              <div className="py-8">
-                <DeskingTool />
+              <CustomerHeader />
+              <div className="flex items-center justify-center h-96">
+                <h1 className="text-white text-4xl">Admin Login - Coming Soon</h1>
               </div>
             </div>
           } />
+          
           <Route path="/credit-application" element={
             <div className="min-h-screen bg-gray-900">
               <DealerHeader />
