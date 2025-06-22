@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
 
@@ -38,8 +38,7 @@ const HamburgerMenu = () => {
   const menuItems = [
     { name: 'Home', path: '/' },
     { name: 'Inventory', path: '/customer-inventory' },
-    { name: 'Service', path: '/service' },
-    { name: 'Repair Shops', path: '/repair-shops' },
+    { name: 'Service & Repair', path: '/repair-shops' },
     { name: 'Dealer Portal', path: '/dealer-portal' },
     { name: 'Admin', path: '/admin' }
   ];
@@ -100,6 +99,123 @@ const HamburgerMenu = () => {
   );
 };
 
+// Dealer Sidebar Component
+const DealerSidebar = ({ activePage = "inventory" }) => {
+  const navigate = useNavigate();
+  
+  const dealerMenuItems = [
+    { 
+      name: 'Inventory', 
+      path: '/dealer-portal', 
+      icon: (
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M19 9l-1.26-3.78A2 2 0 0 0 15.84 4H8.16a2 2 0 0 0-1.9 1.22L5 9H3v11a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1h12v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1V9h-2zM7.5 17a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm9 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+        </svg>
+      )
+    },
+    { 
+      name: 'Leads', 
+      path: '/dealer-leads', 
+      icon: (
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M16 4v4l-4-4-4 4V4c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2zm4 4v12c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2V8c0-1.1.9-2 2-2h1v1c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V6h1c1.1 0 2 .9 2 2z"/>
+        </svg>
+      )
+    },
+    { 
+      name: 'Reports', 
+      path: '/dealer-reports', 
+      icon: (
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5 2.25l1.41-1.41L15.5 12.5 13 15l-3.5-3.5L4 17V5h16v12.25z"/>
+        </svg>
+      )
+    },
+    { 
+      name: 'Desking Tool', 
+      path: '/dealer-tools', 
+      icon: (
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 14H9v-2h2v2zm0-4H9v-2h2v2zm0-4H9V7h2v2zm4 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/>
+        </svg>
+      )
+    },
+    { 
+      name: 'Credit Apps', 
+      path: '/credit-application', 
+      icon: (
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h8c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+        </svg>
+      )
+    },
+    { 
+      name: 'Settings', 
+      path: '/dealer-settings', 
+      icon: (
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+        </svg>
+      )
+    }
+  ];
+
+  return (
+    <div className="fixed left-0 top-0 h-full w-64 bg-gray-900 border-r border-gray-700 z-30">
+      <div className="p-6">
+        {/* Logo */}
+        <div className="mb-8">
+          <PulseLogo size="small" />
+        </div>
+
+        {/* Dealership Info */}
+        <div className="mb-8 p-4 bg-gray-800 rounded-lg">
+          <p className="text-yellow-400 font-bold text-sm">DEALERSHIP</p>
+          <p className="text-white font-medium">Sample Dealership</p>
+          <p className="text-gray-400 text-sm">Nashville, TN</p>
+        </div>
+
+        {/* Menu Items */}
+        <nav className="space-y-2">
+          {dealerMenuItems.map((item) => (
+            <Link
+              key={item.name}
+              to={item.path}
+              className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                activePage === item.name.toLowerCase().replace(' ', '-')
+                  ? 'bg-yellow-400 text-gray-900'
+                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+              }`}
+            >
+              {item.icon}
+              <span className="font-medium">{item.name}</span>
+            </Link>
+          ))}
+        </nav>
+
+        {/* Bottom Actions */}
+        <div className="absolute bottom-6 left-6 right-6 space-y-2">
+          <Link
+            to="/"
+            className="flex items-center justify-center space-x-2 px-4 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-lg transition-colors"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+            <span>Back to Site</span>
+          </Link>
+          <button className="flex items-center justify-center space-x-2 w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5z"/>
+            </svg>
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Customer Header Component
 const CustomerHeader = () => {
   return (
@@ -114,9 +230,12 @@ const CustomerHeader = () => {
             <PulseLogo size="small" />
           </div>
           
-          {/* Right side - could add login button */}
+          {/* Right side - Dealer Login */}
           <div className="flex items-center space-x-4">
-            <Link to="/dealer-portal" className="text-gray-300 hover:text-yellow-400 transition-colors font-medium">
+            <Link 
+              to="/dealer-portal" 
+              className="text-gray-300 hover:text-yellow-400 transition-colors font-medium text-sm whitespace-nowrap"
+            >
               Dealer Login
             </Link>
           </div>
@@ -126,45 +245,25 @@ const CustomerHeader = () => {
   );
 };
 
-// Main Header Component - Dealer Portal (existing)
+// Dealer Header Component (for dealer portal pages)
 const DealerHeader = ({ activePage = "inventory" }) => {
-  const [selectedDealership, setSelectedDealership] = useState("Sample Dealership");
-  
   return (
-    <header className="bg-gray-900 border-b border-gray-700">
-      <div className="max-w-full px-6 py-4">
+    <header className="bg-gray-900 border-b border-gray-700 ml-64">
+      <div className="px-6 py-4">
         <div className="flex justify-between items-center">
-          {/* PULSE Logo */}
-          <PulseLogo size="small" />
+          <h1 className="text-2xl font-bold text-white capitalize">
+            {activePage.replace('-', ' ')}
+          </h1>
           
-          {/* Main Navigation */}
-          <nav className="flex space-x-8">
-            <Link to="/dealer-portal" className={`font-semibold text-lg pb-1 ${activePage === 'inventory' ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-gray-300 hover:text-white'}`}>
-              INVENTORY
-            </Link>
-            <Link to="/dealer-leads" className={`font-semibold text-lg pb-1 ${activePage === 'leads' ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-gray-300 hover:text-white'}`}>
-              LEADS
-            </Link>
-            <Link to="/dealer-reports" className={`font-semibold text-lg pb-1 ${activePage === 'reports' ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-gray-300 hover:text-white'}`}>
-              REPORTS
-            </Link>
-            <Link to="/dealer-tools" className={`font-semibold text-lg pb-1 ${activePage === 'tools' ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-gray-300 hover:text-white'}`}>
-              TOOLS
-            </Link>
-          </nav>
-
-          {/* Dealership Selector */}
-          <div className="relative">
-            <select 
-              value={selectedDealership}
-              onChange={(e) => setSelectedDealership(e.target.value)}
-              className="bg-gray-800 text-white px-4 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-            >
-              <option>Sample Dealership</option>
-              <option>Premier Auto Group</option>
-              <option>Elite Motors</option>
-              <option>Apex Auto Sales</option>
-            </select>
+          {/* User Info */}
+          <div className="flex items-center space-x-4">
+            <div className="text-right">
+              <p className="text-white font-medium">John Dealer</p>
+              <p className="text-gray-400 text-sm">Manager</p>
+            </div>
+            <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center">
+              <span className="text-gray-900 font-bold">JD</span>
+            </div>
           </div>
         </div>
       </div>
@@ -257,19 +356,70 @@ const CustomerHomePage = () => {
                 onClick={() => navigate('/repair-shops')}
                 className="bg-transparent border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-gray-900 px-8 py-4 rounded-xl font-bold text-lg transition-colors"
               >
-                Find Repair Shops
+                Service & Repair
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Features Section */}
+      {/* Featured Vehicles Section */}
       <section className="bg-gray-100 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose PULSE Auto Market?</h2>
-            <p className="text-xl text-gray-600">Your trusted partner in finding the perfect vehicle</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Featured Vehicles</h2>
+            <p className="text-xl text-gray-600">Hand-picked vehicles from our trusted dealer network</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { id: 1, year: 2021, make: 'Audi', model: 'A4 Premium Quattro', price: 28500, mileage: 23450, dealer: 'Apex Auto' },
+              { id: 2, year: 2020, make: 'Ford', model: 'F-150 XLT', price: 32900, mileage: 18200, dealer: 'Premier Motors' },
+              { id: 3, year: 2019, make: 'Honda', model: 'CR-V EX', price: 24800, mileage: 28900, dealer: 'Elite Auto Group' }
+            ].map((vehicle) => (
+              <div key={vehicle.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer">
+                <div className="h-48 bg-gray-200 flex items-center justify-center">
+                  <svg className="w-20 h-20 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 9l-1.26-3.78A2 2 0 0 0 15.84 4H8.16a2 2 0 0 0-1.9 1.22L5 9H3v11a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1h12v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1V9h-2zM7.5 17a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm9 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                  </svg>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    {vehicle.year} {vehicle.make} {vehicle.model}
+                  </h3>
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-2xl font-bold text-yellow-600">
+                      ${vehicle.price.toLocaleString()}
+                    </span>
+                    <span className="text-gray-600">
+                      {vehicle.mileage.toLocaleString()} miles
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    <p className="font-medium">{vehicle.dealer}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <button 
+              onClick={() => navigate('/customer-inventory')}
+              className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-8 py-3 rounded-lg font-bold transition-colors"
+            >
+              View All Vehicles
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="bg-gray-900 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Why Choose PULSE Auto Market?</h2>
+            <p className="text-xl text-gray-400">Your trusted partner in finding the perfect vehicle</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -279,8 +429,8 @@ const CustomerHomePage = () => {
                   <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Authentic Photos</h3>
-              <p className="text-gray-600">Only real dealer photos - no stock images or placeholders</p>
+              <h3 className="text-xl font-bold text-white mb-2">Authentic Photos</h3>
+              <p className="text-gray-400">Only real dealer photos - no stock images or placeholders</p>
             </div>
 
             <div className="text-center">
@@ -289,8 +439,8 @@ const CustomerHomePage = () => {
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Trusted Dealers</h3>
-              <p className="text-gray-600">Verified dealerships with excellent customer service</p>
+              <h3 className="text-xl font-bold text-white mb-2">Trusted Dealers</h3>
+              <p className="text-gray-400">Verified dealerships with excellent customer service</p>
             </div>
 
             <div className="text-center">
@@ -299,8 +449,8 @@ const CustomerHomePage = () => {
                   <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Fast & Easy</h3>
-              <p className="text-gray-600">Quick search, instant results, seamless buying experience</p>
+              <h3 className="text-xl font-bold text-white mb-2">Fast & Easy</h3>
+              <p className="text-gray-400">Quick search, instant results, seamless buying experience</p>
             </div>
           </div>
         </div>
@@ -421,8 +571,8 @@ const CustomerInventoryPage = () => {
   );
 };
 
-// Repair Shops Page
-const RepairShopsPage = () => {
+// Service & Repair Shops Page
+const ServiceRepairPage = () => {
   const [repairShops, setRepairShops] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -432,33 +582,36 @@ const RepairShopsPage = () => {
       setRepairShops([
         {
           id: 1,
-          name: 'Elite Auto Repair',
+          name: 'Elite Auto Repair & Service',
           address: '123 Main St, Nashville, TN 37203',
           phone: '(615) 555-0123',
           rating: 4.8,
           reviews: 156,
-          services: ['Oil Change', 'Brake Service', 'Engine Repair', 'Transmission'],
-          hours: 'Mon-Fri: 8AM-6PM, Sat: 8AM-4PM'
+          services: ['Oil Change', 'Brake Service', 'Engine Repair', 'Transmission', 'AC Repair', 'Tire Service'],
+          hours: 'Mon-Fri: 8AM-6PM, Sat: 8AM-4PM',
+          specialties: ['Full Service', 'Quick Lube', 'Diagnostics']
         },
         {
           id: 2,
-          name: 'Premier Auto Service',
+          name: 'Premier Auto Service Center',
           address: '456 Broadway, Memphis, TN 38103',
           phone: '(901) 555-0124',
           rating: 4.6,
           reviews: 98,
-          services: ['Diagnostic', 'AC Repair', 'Tire Service', 'Battery Replacement'],
-          hours: 'Mon-Fri: 7AM-7PM, Sat: 8AM-5PM'
+          services: ['Diagnostic', 'AC Repair', 'Tire Service', 'Battery Replacement', 'Oil Change', 'Brake Service'],
+          hours: 'Mon-Fri: 7AM-7PM, Sat: 8AM-5PM',
+          specialties: ['Import Service', 'Electrical', 'Performance']
         },
         {
           id: 3,
-          name: 'Quick Fix Auto',
+          name: 'Quick Fix Auto Service',
           address: '789 Union Ave, Knoxville, TN 37902',
           phone: '(865) 555-0125',
           rating: 4.5,
           reviews: 203,
-          services: ['Quick Lube', 'Inspection', 'Exhaust Service', 'Suspension'],
-          hours: 'Mon-Sat: 8AM-6PM, Sun: 10AM-4PM'
+          services: ['Quick Lube', 'Inspection', 'Exhaust Service', 'Suspension', 'Oil Change', 'Brake Service'],
+          hours: 'Mon-Sat: 8AM-6PM, Sun: 10AM-4PM',
+          specialties: ['Quick Service', 'Suspension', 'Exhaust']
         }
       ]);
       setLoading(false);
@@ -472,7 +625,7 @@ const RepairShopsPage = () => {
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-yellow-400 mb-4"></div>
-            <p className="text-white text-xl">Finding repair shops...</p>
+            <p className="text-white text-xl">Finding service centers...</p>
           </div>
         </div>
       </div>
@@ -485,9 +638,9 @@ const RepairShopsPage = () => {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-4">Auto Repair Shops</h1>
+          <h1 className="text-4xl font-bold text-white mb-4">Auto Service & Repair</h1>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Find trusted automotive service centers near you. All shops are vetted and reviewed by our community.
+            Find trusted automotive service centers and repair shops near you. Professional service from oil changes to major repairs.
           </p>
         </div>
 
@@ -506,14 +659,15 @@ const RepairShopsPage = () => {
               <option>Engine Repair</option>
               <option>Transmission</option>
               <option>AC Repair</option>
+              <option>Tire Service</option>
             </select>
             <button className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-6 py-3 rounded-lg font-bold transition-colors">
-              Search Shops
+              Find Service Centers
             </button>
           </div>
         </div>
 
-        {/* Repair Shops Grid */}
+        {/* Service Centers Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {repairShops.map((shop) => (
             <div key={shop.id} className="bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
@@ -543,17 +697,30 @@ const RepairShopsPage = () => {
                 <p className="text-gray-300 text-sm mb-3">{shop.phone}</p>
                 <p className="text-gray-400 text-sm mb-4">{shop.hours}</p>
 
-                {/* Services */}
+                {/* Specialties */}
                 <div className="mb-4">
+                  <p className="text-gray-400 text-sm mb-2">Specialties:</p>
                   <div className="flex flex-wrap gap-1">
-                    {shop.services.slice(0, 3).map((service, index) => (
+                    {shop.specialties.map((specialty, index) => (
+                      <span key={index} className="bg-yellow-400 text-gray-900 px-2 py-1 rounded text-xs font-medium">
+                        {specialty}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Services */}
+                <div className="mb-6">
+                  <p className="text-gray-400 text-sm mb-2">Services:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {shop.services.slice(0, 4).map((service, index) => (
                       <span key={index} className="bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs">
                         {service}
                       </span>
                     ))}
-                    {shop.services.length > 3 && (
+                    {shop.services.length > 4 && (
                       <span className="bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs">
-                        +{shop.services.length - 3} more
+                        +{shop.services.length - 4} more
                       </span>
                     )}
                   </div>
@@ -561,11 +728,16 @@ const RepairShopsPage = () => {
 
                 <div className="space-y-2">
                   <button className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 px-4 rounded-lg transition-colors">
-                    Get Directions
+                    Schedule Service
                   </button>
-                  <button className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                    Call Now
-                  </button>
+                  <div className="flex space-x-2">
+                    <button className="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                      Call Now
+                    </button>
+                    <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                      Directions
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -576,7 +748,7 @@ const RepairShopsPage = () => {
   );
 };
 
-// Vehicle Modal Component (existing)
+// Vehicle Modal Component (existing functionality)
 const VehicleModal = ({ vehicle, isOpen, onClose }) => {
   if (!isOpen || !vehicle) return null;
 
@@ -620,16 +792,6 @@ const VehicleModal = ({ vehicle, isOpen, onClose }) => {
                   <p className="text-gray-400 text-sm">Mileage</p>
                   <p className="text-white font-semibold">{vehicle.mileage?.toLocaleString()} miles</p>
                 </div>
-                <div>
-                  <p className="text-gray-400 text-sm">Status</p>
-                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                    {vehicle.status}
-                  </span>
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm">Stock #</p>
-                  <p className="text-white">{vehicle.stock_number || 'N/A'}</p>
-                </div>
               </div>
               
               <div className="flex space-x-3 pt-4">
@@ -651,12 +813,10 @@ const VehicleModal = ({ vehicle, isOpen, onClose }) => {
   );
 };
 
-// Add Vehicle Modal (existing - keeping for dealer portal)
+// Add Vehicle Modal (simplified for space)
 const AddVehicleModal = ({ isOpen, onClose, onVehicleAdded }) => {
   const [formData, setFormData] = useState({
-    year: '', make: '', model: '', trim: '', mileage: '', price: '', cost: '',
-    exterior_color: '', interior_color: '', transmission: '', fuel_type: '',
-    drivetrain: '', engine: '', stock_number: '', description: '', vin: '',
+    year: '', make: '', model: '', price: '', mileage: '',
     dealer_id: 'sample-dealer-1', dealer_name: 'Sample Dealership'
   });
 
@@ -670,12 +830,7 @@ const AddVehicleModal = ({ isOpen, onClose, onVehicleAdded }) => {
       const response = await axios.post(`${API}/vehicles`, formData);
       onVehicleAdded(response.data);
       onClose();
-      setFormData({
-        year: '', make: '', model: '', trim: '', mileage: '', price: '', cost: '',
-        exterior_color: '', interior_color: '', transmission: '', fuel_type: '',
-        drivetrain: '', engine: '', stock_number: '', description: '', vin: '',
-        dealer_id: 'sample-dealer-1', dealer_name: 'Sample Dealership'
-      });
+      setFormData({ year: '', make: '', model: '', price: '', mileage: '', dealer_id: 'sample-dealer-1', dealer_name: 'Sample Dealership' });
     } catch (error) {
       console.error('Error adding vehicle:', error);
       alert('Error adding vehicle. Please try again.');
@@ -691,72 +846,53 @@ const AddVehicleModal = ({ isOpen, onClose, onVehicleAdded }) => {
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
         <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={onClose}></div>
         
-        <div className="inline-block w-full max-w-4xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-gray-800 shadow-xl rounded-2xl max-h-[90vh] overflow-y-auto">
+        <div className="inline-block w-full max-w-2xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-gray-800 shadow-xl rounded-2xl">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-2xl font-bold text-white">Add New Vehicle</h3>
             <button onClick={onClose} className="text-gray-400 hover:text-white text-2xl">×</button>
           </div>
           
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Year *</label>
-                <input
-                  type="number"
-                  value={formData.year}
-                  onChange={(e) => setFormData({...formData, year: e.target.value})}
-                  required
-                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Make *</label>
-                <input
-                  type="text"
-                  value={formData.make}
-                  onChange={(e) => setFormData({...formData, make: e.target.value})}
-                  required
-                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Model *</label>
-                <input
-                  type="text"
-                  value={formData.model}
-                  onChange={(e) => setFormData({...formData, model: e.target.value})}
-                  required
-                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Price *</label>
-                <input
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => setFormData({...formData, price: e.target.value})}
-                  required
-                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                />
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <input
+                type="number"
+                placeholder="Year"
+                value={formData.year}
+                onChange={(e) => setFormData({...formData, year: e.target.value})}
+                required
+                className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              />
+              <input
+                type="text"
+                placeholder="Make"
+                value={formData.make}
+                onChange={(e) => setFormData({...formData, make: e.target.value})}
+                required
+                className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              />
+              <input
+                type="text"
+                placeholder="Model"
+                value={formData.model}
+                onChange={(e) => setFormData({...formData, model: e.target.value})}
+                required
+                className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              />
+              <input
+                type="number"
+                placeholder="Price"
+                value={formData.price}
+                onChange={(e) => setFormData({...formData, price: e.target.value})}
+                required
+                className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              />
             </div>
             
-            <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={onClose}
-                className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg"
-              >
+            <div className="flex justify-end space-x-4 pt-4">
+              <button type="button" onClick={onClose} className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg">
                 Cancel
               </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 px-6 rounded-lg disabled:opacity-50"
-              >
+              <button type="submit" disabled={submitting} className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 px-6 rounded-lg disabled:opacity-50">
                 {submitting ? 'Adding...' : 'Add Vehicle'}
               </button>
             </div>
@@ -767,11 +903,10 @@ const AddVehicleModal = ({ isOpen, onClose, onVehicleAdded }) => {
   );
 };
 
-// Dealer Inventory Page (existing functionality for dealer portal)
+// Dealer Inventory Page (with left sidebar)
 const DealerInventoryPage = () => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState('grid');
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [showVehicleModal, setShowVehicleModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -810,8 +945,9 @@ const DealerInventoryPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900">
+        <DealerSidebar activePage="inventory" />
         <DealerHeader activePage="inventory" />
-        <div className="flex items-center justify-center h-96">
+        <div className="ml-64 flex items-center justify-center h-96">
           <div className="text-center">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-yellow-400 mb-4"></div>
             <p className="text-white text-xl">Loading inventory...</p>
@@ -823,11 +959,15 @@ const DealerInventoryPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-900">
+      <DealerSidebar activePage="inventory" />
       <DealerHeader activePage="inventory" />
       
-      <div className="max-w-full px-6 py-8">
+      <div className="ml-64 px-6 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-white">Dealer Inventory</h1>
+          <div>
+            <h2 className="text-2xl font-bold text-white">Vehicle Inventory</h2>
+            <p className="text-gray-400">Manage your dealership's vehicle inventory</p>
+          </div>
           <button 
             onClick={() => setShowAddModal(true)}
             className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-6 py-3 rounded-lg flex items-center"
@@ -894,37 +1034,52 @@ function App() {
           {/* Customer Pages */}
           <Route path="/" element={<CustomerHomePage />} />
           <Route path="/customer-inventory" element={<CustomerInventoryPage />} />
-          <Route path="/service" element={
-            <div className="min-h-screen bg-gray-900">
-              <CustomerHeader />
-              <div className="flex items-center justify-center h-96">
-                <h1 className="text-white text-4xl">Service Page - Coming Soon</h1>
-              </div>
-            </div>
-          } />
-          <Route path="/repair-shops" element={<RepairShopsPage />} />
+          <Route path="/repair-shops" element={<ServiceRepairPage />} />
           
           {/* Dealer Portal Pages */}
           <Route path="/dealer-portal" element={<DealerInventoryPage />} />
           <Route path="/dealer-leads" element={
             <div className="min-h-screen bg-gray-900">
+              <DealerSidebar activePage="leads" />
               <DealerHeader activePage="leads" />
-              <LeadsManagement />
+              <div className="ml-64">
+                <LeadsManagement />
+              </div>
             </div>
           } />
           <Route path="/dealer-reports" element={
             <div className="min-h-screen bg-gray-900">
+              <DealerSidebar activePage="reports" />
               <DealerHeader activePage="reports" />
-              <div className="flex items-center justify-center h-96">
+              <div className="ml-64 flex items-center justify-center h-96">
                 <h1 className="text-white text-4xl">Dealer Reports - Coming Soon</h1>
               </div>
             </div>
           } />
           <Route path="/dealer-tools" element={
             <div className="min-h-screen bg-gray-900">
-              <DealerHeader activePage="tools" />
-              <div className="py-8">
+              <DealerSidebar activePage="desking-tool" />
+              <DealerHeader activePage="desking tool" />
+              <div className="ml-64 py-8">
                 <DeskingTool />
+              </div>
+            </div>
+          } />
+          <Route path="/credit-application" element={
+            <div className="min-h-screen bg-gray-900">
+              <DealerSidebar activePage="credit-apps" />
+              <DealerHeader activePage="credit applications" />
+              <div className="ml-64 py-8">
+                <CreditApplication />
+              </div>
+            </div>
+          } />
+          <Route path="/dealer-settings" element={
+            <div className="min-h-screen bg-gray-900">
+              <DealerSidebar activePage="settings" />
+              <DealerHeader activePage="settings" />
+              <div className="ml-64 flex items-center justify-center h-96">
+                <h1 className="text-white text-4xl">Dealer Settings - Coming Soon</h1>
               </div>
             </div>
           } />
@@ -935,15 +1090,6 @@ function App() {
               <CustomerHeader />
               <div className="flex items-center justify-center h-96">
                 <h1 className="text-white text-4xl">Admin Login - Coming Soon</h1>
-              </div>
-            </div>
-          } />
-          
-          <Route path="/credit-application" element={
-            <div className="min-h-screen bg-gray-900">
-              <DealerHeader />
-              <div className="py-8">
-                <CreditApplication />
               </div>
             </div>
           } />
